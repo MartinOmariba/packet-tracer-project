@@ -1,1 +1,129 @@
 sh version
+sh ip interface brief
+sh run | begin vty
+
+#CONFIGURUNG PASSWORDS IN VTY LINES
+
+username martin secret cisco
+line vty 0 15
+login local
+transport input all
+
+#DHCP FOR EVERY SUBNETWORK
+
+ip excluded-address (range of address)
+ip dhcp pool (name)
+network (ip address/ subnet mask)
+default_router (ip address)
+exit
+
+sh ip dhcp binding
+sh ip dhcp pool
+sh ip dhcp conflict
+
+#CONFIGURING PAGP ON L2 DEVICES(SALES/ACCOUNTS/MANAGEMENT/HELPDESK)
+
+interface range f0/6-9
+no shut
+channel-group 3 mode desirable
+exit
+interface port-channel 3
+description crosslink to access2
+switchport mode trunk
+switchport trunk native vlan 99
+
+sh etherchannel summary
+
+#CONFIGURING OSPF 
+FIRST: ON MULTILAYER SWICHES
+  enable routing
+    ip routing
+
+   create loopback interface
+    int loop 0
+    ip ip_address subnet_mask
+
+    router ospf 1
+    net 0.0.0.0 0.0.0.0 area 0
+    router-id ip_adress
+
+    sh ip ospf neighbours
+    sh ip ospf database
+    sh ip ospf interface
+
+
+#CONFIGURING NAT ON 3.3.3.3
+
+  interface GigabitEthernet0/2
+   ip address 192.168.1.1 255.255.255.252
+   ip nat inside
+   duplex auto
+   speed auto
+
+   interface GigabitEthernet0/0
+     ip address 203.0.113.1 255.255.255.240
+     ip nat outside
+     duplex auto
+     speed auto
+
+    #access list
+    access-list 1 permit 192.168.0.0 0.0.255.255
+
+    #PAT
+    ip nat pool martin 203.0.113.3 203.0.113.15 netmask 255.255.255.240
+    ip nat inside source list 1 pool martin overload
+
+#CONFIGURING WLAN SIDE
+
+  #on 2.2.2.2
+  ip dhcp pool WIRELESS
+    network 192.168.2.0 255.255.255.0
+    default-router 192.168.2.1
+
+#CONFIGURING SWITCHPORT SECURITY ON ACCESS1/2
+
+  interface FastEthernet0/1
+    switchport port-security mac-address sticky 
+    switchport port-security violation restrict
+
+#CONFIGURING NTP AND SYSLOG SERVER
+
+  #SYSLOG 
+  logging (ip_add of server) ex logging 10.1.1.1
+  logging console
+  logging bufferd 4096
+  logging trap debbuging
+
+  sh logging
+
+  service timestamp log datetime msec
+
+  #NTP on switches
+  en :
+      clock set 20:27:00 11 jan 2024
+  gcm:
+      service timestamp log datetime msec
+
+  #NTP on router
+  gcm: 
+      ntp server (ip_address)
+      service timestamp log datetime msec
+
+#BACKUP CONFIGURATIONS
+   
+   sh flash
+   sh version
+
+   copy flash tftp 
+   tftp server/ remote host (server ip add)
+   destination filename (choose filename)
+
+   or 
+
+   copy startup-config tftp
+   remote host(server ip_address)
+   destination filename
+
+
+
+

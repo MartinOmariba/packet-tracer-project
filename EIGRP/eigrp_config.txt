@@ -1,0 +1,17 @@
+ON ROUTERS:
+    interface int id
+    delay (tens of Usec)
+    bandwidth (kbps)
+    ip add (ip add/subnet mask)
+    duplex full
+    speed 100
+
+    router eigrp (pid)
+    network (network id)
+    no auto-summary
+
+TROUBLESHOOTING:
+    show run | sec eigrp
+    sh ip eigrp interface
+    sh ip eigrp neighbour
+    sh ip eigrp topology
